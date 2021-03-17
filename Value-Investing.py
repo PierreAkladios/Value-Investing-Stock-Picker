@@ -48,3 +48,6 @@ print(int(json_object["defaultKeyStatistics"]["financialData"]["debtToEquity"]["
 
 #search for target low and high prices
 #go through financial data and prices to see if there is any more usefull metrics
+#get market cap
+#long term trend
+#Recomendation key
