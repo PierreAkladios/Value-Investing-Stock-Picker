@@ -37,6 +37,7 @@ freeCachFlow = 0 #the higher the better
 peg_ratio = 0 # than 1 is good
 marketCap = 0
 recommendationKey = False
+cachCap_ratio = 0
 
 """ try:
     #API code
@@ -100,6 +101,14 @@ if int(json_object["quoteData"][str(ticker).upper()]["marketCap"]["raw"]) != Non
 if json_object["financialData"]["recommendationKey"] != None:
     if str(json_object["financialData"]["recommendationKey"]) == "buy":
         recommendationKey = True
+
+def cachCap_ratio(freeCachFlow, marketCap):
+    if freeCachFlow != 0 and marketCap != 0:
+       return freeCachFlow/marketCap
+    return 0
+
+def algo_picker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey):
+    pass
 
 print(peg_ratio)
 print(pb_ratio)
