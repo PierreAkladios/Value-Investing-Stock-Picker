@@ -23,7 +23,82 @@ def getMetrics(ticker, country):
 
     return response
 
+def cachCap_ratio(freeCachFlow, marketCap):
+    if freeCachFlow != None and marketCap != None:
+       return freeCachFlow/marketCap
+    return 0
 
+def null_checker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey):
+    non_null_metrics = None #number of non null arguments
+    if peg_ratio != None:
+        non_null_metrics+=1
+    if pb_ratio != None:
+        non_null_metrics+=1
+    if debtEquity_ratio != None:
+        non_null_metrics+=1
+    if cachCap_ratio != None:
+        non_null_metrics +=1 
+    if recommendationKey != None:
+        non_null_metrics +=1
+    return non_null_metrics
+
+#returns the inverted peg ratio because a low peg is good and the algorith will try to get the highest score possible
+def peg(peg_ratio):
+    return 1/peg_ratio
+    
+#not sure
+def pb(pb_ratio): 
+    pass
+
+#not sure
+def debtEquity(debtEquity_ratio):
+    pass
+
+#look at short mid and long term prediction of trends
+def trends(shortT, midT, longT):
+    total = 0
+    number = 0 #number of non null arguments
+    #checking short Term potential
+    if shortT != None:
+        number+=1
+        if(shortT == "UP"):
+            total+=1
+        elif (shortT == "DOWN"):
+            total +=1
+    #checking mid Term potential
+    if midT != None:
+        number+=1
+        if(midT == "UP"):
+            total+=1
+        elif (midT == "DOWN"):
+            total +=1
+    #checking long Term potential
+    if longT != None:
+        number+=1
+        if(longT == "UP"):
+            total+=1
+        elif (longT == "DOWN"):
+            total +=1
+    if number!= 0:
+        return total/number
+    else:
+        return 0
+    
+
+def algo_picker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey):
+    total = 0
+    number_of_metrics = null_checker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey)
+    #check recommendation key
+    if recommendationKey == True:
+        total +=1
+    #check Freecachflow:
+    if cachCap_ratio != None:
+        total += cachCap_ratio
+    #call helper functions for the other 3 methods
+    if peg_ratio!=0:
+        peg(peg_ratio)
+    
+    return total/number_of_metrics
 # metrics come from this article 
 # https://www.investopedia.com/articles/fundamental-analysis/09/five-must-have-metrics-value-investors.asp
 price = None
@@ -34,7 +109,9 @@ peg_ratio = None # than 1 is good
 marketCap = None
 recommendationKey = None
 cachCap_ratio = None
-non_null_metrics = None
+shortT = None
+midT = None
+longT = None
 
 """ try:
     #API code
@@ -66,8 +143,7 @@ while (isInvalid):
         print("ERROR")
         isInvalid = True
 
-#print(response)
-
+#Extracting metrics from json
 if int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"]) != None:
     peg_ratio = int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"])
 if int(json_object["defaultKeyStatistics"]["priceToBook"]["raw"]) != None:
@@ -81,53 +157,22 @@ if int(json_object["quoteData"][str(ticker).upper()]["marketCap"]["raw"]) != Non
 if json_object["financialData"]["recommendationKey"] != None:
     if str(json_object["financialData"]["recommendationKey"]) == "buy":
         recommendationKey = True
+#Extracting trends from json
+if json_object["pageViews"]["shortTermTrend"]!=None:
+    shortT = str(json_object["pageViews"]["shortTermTrend"])
+if json_object["pageViews"]["midTermTrend"]!=None:
+    midT = str(json_object["pageViews"]["midTermTrend"])
+if json_object["pageViews"]["longTermTrend"]!=None:
+    longT = str(json_object["pageViews"]["longTermTrend"])
 
-def cachCap_ratio(freeCachFlow, marketCap):
-    if freeCachFlow != None and marketCap != None:
-       return freeCachFlow/marketCap
-    return 0
-
-def null_checker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey):
-    if peg_ratio != None:
-        non_null_metrics+=1
-    if pb_ratio != None:
-        non_null_metrics+=1
-    if debtEquity_ratio != None:
-        non_null_metrics+=1
-    if cachCap_ratio != None:
-        non_null_metrics +=1 
-    if recommendationKey != None:
-        non_null_metrics +=1
-
-def peg(peg_ratio):
-    pass
-def pb(pb_ratio): 
-    pass
-def debtEquity(debtEquity_ratio):
-    pass
-
-def algo_picker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey):
-    total = 0
-    number_of_metrics = null_checker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey)
-    #check recommendation key
-    if recommendationKey == True:
-        total +=1
-    #check Freecachflow:
-    if cachCap_ratio != None:
-        total += cachCap_ratio
-    #call helper functions for the other 3 methods
-    if peg_ratio!=0
-    
-    return total/number_of_metrics
 
 print(peg_ratio)
 print(pb_ratio)
 print(debtEquity_ratio)
 print(json_object["financialData"]["recommendationKey"])
 print(recommendationKey)
+print(shortT)
+print(midT)
+print(longT)
 
-#search for target low and high prices
 #go through financial data and prices to see if there is any more usefull metrics
-#get market cap
-#long term trend
-#Recomendation key
