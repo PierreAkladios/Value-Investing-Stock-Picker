@@ -23,13 +23,13 @@ def getMetrics(ticker, country):
 
     return response
 
-def cachCap_ratio(freeCachFlow, marketCap):
+def cachCap(freeCachFlow, marketCap):
     if freeCachFlow != None and marketCap != None:
        return freeCachFlow/marketCap
     return 0
 
-def null_checker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey):
-    non_null_metrics = None #number of non null arguments
+def null_checker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey, trend):
+    non_null_metrics = 0 #number of non null arguments
     if peg_ratio != None:
         non_null_metrics+=1
     if pb_ratio != None:
@@ -40,7 +40,10 @@ def null_checker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommend
         non_null_metrics +=1 
     if recommendationKey != None:
         non_null_metrics +=1
+    if trend != None:
+        non_null_metrics+=1
     return non_null_metrics
+    
 
 #returns the inverted peg ratio because a low peg is good and the algorith will try to get the highest score possible
 def peg(peg_ratio):
@@ -85,9 +88,9 @@ def trends(shortT, midT, longT):
         return 0
     
 
-def algo_picker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey):
+def algo_picker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey, trend):
     total = 0
-    number_of_metrics = null_checker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey)
+    number_of_metrics = null_checker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey, trend)
     #check recommendation key
     if recommendationKey == True:
         total +=1
@@ -97,7 +100,12 @@ def algo_picker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommenda
     #call helper functions for the other 3 methods
     if peg_ratio!=0:
         peg(peg_ratio)
-    
+    if trend !=None:
+        total+= trend
+    if peg_ratio !=None:
+        pass
+    if pb_ratio !=None:
+        pass
     return total/number_of_metrics
 # metrics come from this article 
 # https://www.investopedia.com/articles/fundamental-analysis/09/five-must-have-metrics-value-investors.asp
@@ -112,6 +120,7 @@ cachCap_ratio = None
 shortT = None
 midT = None
 longT = None
+trend = None
 
 """ try:
     #API code
@@ -165,14 +174,18 @@ if json_object["pageViews"]["midTermTrend"]!=None:
 if json_object["pageViews"]["longTermTrend"]!=None:
     longT = str(json_object["pageViews"]["longTermTrend"])
 
+trend = trends(shortT,midT,longT)
+cachCap_ratio = cachCap(freeCachFlow,marketCap)
+result = algo_picker(peg(peg_ratio), pb(pb_ratio),debtEquity(debtEquity_ratio),cachCap_ratio, recommendationKey, trend)
 
-print(peg_ratio)
+""" print(peg_ratio)
 print(pb_ratio)
 print(debtEquity_ratio)
 print(json_object["financialData"]["recommendationKey"])
 print(recommendationKey)
 print(shortT)
 print(midT)
-print(longT)
+print(longT) """
 
+print(result)
 #go through financial data and prices to see if there is any more usefull metrics
