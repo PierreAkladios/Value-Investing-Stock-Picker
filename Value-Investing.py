@@ -106,6 +106,14 @@ def algo_picker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommenda
         pass
     if pb_ratio !=None:
         pass
+    #adding all the data for excel
+    listOfMetrics.append(peg_ratio)
+    listOfMetrics.append(pb_ratio)
+    listOfMetrics.append(debtEquity_ratio)
+    listOfMetrics.append(cachCap_ratio)
+    listOfMetrics.append(recommendationKey)
+    listOfMetrics.append(trend)
+    listOfMetrics.append(number_of_metrics)
     return total/number_of_metrics
 # metrics come from this article 
 # https://www.investopedia.com/articles/fundamental-analysis/09/five-must-have-metrics-value-investors.asp
@@ -121,6 +129,7 @@ shortT = None
 midT = None
 longT = None
 trend = None
+listOfMetrics = []
 
 """ try:
     #API code
@@ -177,6 +186,8 @@ if json_object["pageViews"]["longTermTrend"]!=None:
 trend = trends(shortT,midT,longT)
 cachCap_ratio = cachCap(freeCachFlow,marketCap)
 result = algo_picker(peg(peg_ratio), pb(pb_ratio),debtEquity(debtEquity_ratio),cachCap_ratio, recommendationKey, trend)
+#adding result for excel
+listOfMetrics.append(result)
 
 """ print(peg_ratio)
 print(pb_ratio)
@@ -188,4 +199,17 @@ print(midT)
 print(longT) """
 
 print(result)
-#go through financial data and prices to see if there is any more usefull metrics
+
+
+#Putting esults in an excel sheet
+# Create an new Excel file and add a worksheet.
+book = xlsxwriter.Workbook('test.xlsx')
+sheet = book.add_worksheet()
+#Printing all the metrics on a row in excel
+for col_num, data in enumerate(listOfMetrics):
+    sheet.write(0, col_num, data)
+
+book.close()
+
+#make the input a .txt file containing a long list of stocks
+#making the excel part and the rest of the program able to iterate
