@@ -49,13 +49,13 @@ def null_checker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommend
 def peg(peg_ratio):
     return 1/peg_ratio
     
-#not sure
+#Smaller than 1 is good so we inverse it to et the highest score
 def pb(pb_ratio): 
-    pass
+    return 1/pb_ratio
 
-#not sure
+#The lower the better in debt equity but algorithm is based on high score
 def debtEquity(debtEquity_ratio):
-    pass
+    return 1/debtEquity_ratio
 
 #look at short mid and long term prediction of trends
 def trends(shortT, midT, longT):
@@ -117,6 +117,18 @@ def algo_picker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommenda
     return total/number_of_metrics
 # metrics come from this article 
 # https://www.investopedia.com/articles/fundamental-analysis/09/five-must-have-metrics-value-investors.asp
+
+#file reader
+def file_reader(fileName):
+    file1 = open(fileName, "r")
+    Lines = file1.readlines()
+    #adding all the ticker symbol in the file in a list
+    for line in Lines:
+        Names.append(line)
+
+
+#Global variables
+Names = []       
 price = None
 debtEquity_ratio = None # not too high but not too low
 pb_ratio = None #<1 is good
@@ -162,7 +174,7 @@ while (isInvalid):
         isInvalid = True
 
 #Extracting metrics from json
-if int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"]) != None:
+if int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"]) != None: #causes error with ARKK
     peg_ratio = int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"])
 if int(json_object["defaultKeyStatistics"]["priceToBook"]["raw"]) != None:
     pb_ratio = int(json_object["defaultKeyStatistics"]["priceToBook"]["raw"])
