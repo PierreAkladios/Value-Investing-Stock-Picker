@@ -126,6 +126,44 @@ def file_reader(fileName):
     for line in Lines:
         Names.append(line)
 
+def json(json_object):
+    #Extracting metrics from json
+    if int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"]) != None: #causes error with ARKK
+        peg_ratio = int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"])
+    if int(json_object["defaultKeyStatistics"]["priceToBook"]["raw"]) != None:
+        pb_ratio = int(json_object["defaultKeyStatistics"]["priceToBook"]["raw"])
+    if int(json_object["financialData"]["debtToEquity"]["raw"]) != None:
+        debtEquity_ratio = int(json_object["financialData"]["debtToEquity"]["raw"])
+    if int(json_object["financialData"]["freeCashflow"]["raw"]) != None:
+        freeCachFlow = int(json_object["financialData"]["freeCashflow"]["raw"])
+    if int(json_object["quoteData"][str(ticker).upper()]["marketCap"]["raw"]) != None:
+        marketCap = int(json_object["quoteData"][str(ticker).upper()]["marketCap"]["raw"])    
+    if json_object["financialData"]["recommendationKey"] != None:
+        if str(json_object["financialData"]["recommendationKey"]) == "buy":
+            recommendationKey = True
+    #Extracting trends from json
+    if json_object["pageViews"]["shortTermTrend"]!=None:
+        shortT = str(json_object["pageViews"]["shortTermTrend"])
+    if json_object["pageViews"]["midTermTrend"]!=None:
+        midT = str(json_object["pageViews"]["midTermTrend"])
+    if json_object["pageViews"]["longTermTrend"]!=None:
+        longT = str(json_object["pageViews"]["longTermTrend"])
+
+#reseting global variables to 0 after each iteration
+def clear_metrics():
+    price = None
+    debtEquity_ratio = None # not too high but not too low
+    pb_ratio = None #<1 is good
+    freeCachFlow = None #the higher the better
+    peg_ratio = None # than 1 is good
+    marketCap = None
+    recommendationKey = None
+    cachCap_ratio = None
+    shortT = None
+    midT = None
+    longT = None
+    trend = None
+
 
 #Global variables
 Names = []       
@@ -173,34 +211,14 @@ while (isInvalid):
         print("ERROR")
         isInvalid = True
 
-#Extracting metrics from json
-if int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"]) != None: #causes error with ARKK
-    peg_ratio = int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"])
-if int(json_object["defaultKeyStatistics"]["priceToBook"]["raw"]) != None:
-    pb_ratio = int(json_object["defaultKeyStatistics"]["priceToBook"]["raw"])
-if int(json_object["financialData"]["debtToEquity"]["raw"]) != None:
-    debtEquity_ratio = int(json_object["financialData"]["debtToEquity"]["raw"])
-if int(json_object["financialData"]["freeCashflow"]["raw"]) != None:
-    freeCachFlow = int(json_object["financialData"]["freeCashflow"]["raw"])
-if int(json_object["quoteData"][str(ticker).upper()]["marketCap"]["raw"]) != None:
-    marketCap = int(json_object["quoteData"][str(ticker).upper()]["marketCap"]["raw"])    
-if json_object["financialData"]["recommendationKey"] != None:
-    if str(json_object["financialData"]["recommendationKey"]) == "buy":
-        recommendationKey = True
-#Extracting trends from json
-if json_object["pageViews"]["shortTermTrend"]!=None:
-    shortT = str(json_object["pageViews"]["shortTermTrend"])
-if json_object["pageViews"]["midTermTrend"]!=None:
-    midT = str(json_object["pageViews"]["midTermTrend"])
-if json_object["pageViews"]["longTermTrend"]!=None:
-    longT = str(json_object["pageViews"]["longTermTrend"])
-
-trend = trends(shortT,midT,longT)
+#commented out because it is only for 1 ticker at a time
+"""trend = trends(shortT,midT,longT)
 cachCap_ratio = cachCap(freeCachFlow,marketCap)
 result = algo_picker(peg(peg_ratio), pb(pb_ratio),debtEquity(debtEquity_ratio),cachCap_ratio, recommendationKey, trend)
 #adding result for excel
-listOfMetrics.append(result)
+listOfMetrics.append(result)"""
 
+#Test
 """ print(peg_ratio)
 print(pb_ratio)
 print(debtEquity_ratio)
@@ -225,3 +243,21 @@ book.close()
 
 #make the input a .txt file containing a long list of stocks
 #making the excel part and the rest of the program able to iterate
+
+#making it work for many stocks at the same time
+
+#getting the list of all ticker symbols
+fileName = input("Enter the name of the .txt file: ").strip().upper()
+file_reader(fileName)
+
+for name in Names:
+    response = getMetrics(name, CA)
+    json_object = json.loads(response.text)
+    json(json_object)
+    trend = trends(shortT,midT,longT)
+    cachCap_ratio = cachCap(freeCachFlow,marketCap)
+    result = algo_picker(peg(peg_ratio), pb(pb_ratio),debtEquity(debtEquity_ratio),cachCap_ratio, recommendationKey, trend)
+    #adding result for excel
+    listOfMetrics.append(result)
+    clear_metrics()
+
