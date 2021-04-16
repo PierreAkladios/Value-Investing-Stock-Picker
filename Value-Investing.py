@@ -91,21 +91,23 @@ def trends(shortT, midT, longT):
 def algo_picker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey, trend):
     total = 0
     number_of_metrics = null_checker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommendationKey, trend)
-    #check recommendation key
-    if recommendationKey == True:
-        total +=1
+     #call helper functions for the first 3 metrics
+    if peg_ratio!=0 and peg_ratio!=None :
+        total += peg(peg_ratio)
+    if pb_ratio !=None and pb_ratio!=0:
+        total+=pb(pb_ratio)
+    if debtEquity_ratio != None and debtEquity_ratio != 0:
+        total += debtEquity(debtEquity_ratio)
     #check Freecachflow:
     if cachCap_ratio != None:
         total += cachCap_ratio
-    #call helper functions for the other 3 methods
-    if peg_ratio!=0:
-        peg(peg_ratio)
+    #check recommendation key
+    if recommendationKey == True:
+        total +=1
+    #adding trend to the total    
     if trend !=None:
         total+= trend
-    if peg_ratio !=None:
-        pass
-    if pb_ratio !=None:
-        pass
+
     #adding all the data for excel
     listOfMetrics.append(peg_ratio)
     listOfMetrics.append(pb_ratio)
@@ -126,7 +128,7 @@ def file_reader(fileName):
     for line in Lines:
         Names.append(line)
 
-def json(json_object):
+def json_reader(json_object):
     #Extracting metrics from json
     if int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"]) != None: #causes error with ARKK
         peg_ratio = int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"])
@@ -163,6 +165,9 @@ def clear_metrics():
     midT = None
     longT = None
     trend = None
+    json_object = None
+    response = None
+    listOfMetrics.clear()
 
 
 #Global variables
@@ -181,20 +186,17 @@ longT = None
 trend = None
 listOfMetrics = []
 
-""" try:
-    #API code
-catch(not equal 200) """
 
 #printing the data for texts
 #print(response.text)
-#changing Jason
 
 #NAME OF ERROR JSONDecodeError
 #use this to do the try catch statment to get the calues
 #Like a loop that keeps asking for the two inputs then calls the API function 
 json_object = None
 response = None
-
+#used for 1 ticker only
+'''
 isInvalid = True
 while (isInvalid):
     
@@ -210,7 +212,7 @@ while (isInvalid):
     except(json.decoder.JSONDecodeError):
         print("ERROR")
         isInvalid = True
-
+'''
 #commented out because it is only for 1 ticker at a time
 """trend = trends(shortT,midT,longT)
 cachCap_ratio = cachCap(freeCachFlow,marketCap)
@@ -228,10 +230,10 @@ print(shortT)
 print(midT)
 print(longT) """
 
-print(result)
+#print(result)
 
 
-#Putting esults in an excel sheet
+"""#Putting esults in an excel sheet
 # Create an new Excel file and add a worksheet.
 book = xlsxwriter.Workbook('test.xlsx')
 sheet = book.add_worksheet()
@@ -239,7 +241,7 @@ sheet = book.add_worksheet()
 for col_num, data in enumerate(listOfMetrics):
     sheet.write(0, col_num, data)
 
-book.close()
+book.close()"""
 
 #make the input a .txt file containing a long list of stocks
 #making the excel part and the rest of the program able to iterate
@@ -249,15 +251,25 @@ book.close()
 #getting the list of all ticker symbols
 fileName = input("Enter the name of the .txt file: ").strip().upper()
 file_reader(fileName)
-
+# Create an new Excel file and add a worksheet.
+book = xlsxwriter.Workbook("test1.xlsx")
+sheet = book.add_worksheet()
+i = 0
 for name in Names:
-    response = getMetrics(name, CA)
+    ticker = name.strip()
+    listOfMetrics.append(ticker)
+    response = getMetrics(ticker, "CA")
     json_object = json.loads(response.text)
-    json(json_object)
+    json_reader(json_object)
     trend = trends(shortT,midT,longT)
     cachCap_ratio = cachCap(freeCachFlow,marketCap)
-    result = algo_picker(peg(peg_ratio), pb(pb_ratio),debtEquity(debtEquity_ratio),cachCap_ratio, recommendationKey, trend)
+    result = algo_picker(peg_ratio, pb_ratio,debtEquity_ratio,cachCap_ratio, recommendationKey, trend)
     #adding result for excel
     listOfMetrics.append(result)
+    #Printing all the metrics on a row in excel
+    for col_num, data in enumerate(listOfMetrics):
+        sheet.write(i, col_num, data)
     clear_metrics()
+    i+=1
+book.close()
 
