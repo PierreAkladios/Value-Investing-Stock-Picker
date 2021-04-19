@@ -61,27 +61,26 @@ def debtEquity(debtEquity_ratio):
 def trends(shortT, midT, longT):
     total = 0
     number = 0 #number of non null arguments
+
+    #for debugging 
+    print(shortT)
+    print(midT)
+    print(longT)
     #checking short Term potential
     if shortT != None:
         number+=1
         if(shortT == "UP"):
             total+=1
-        elif (shortT == "DOWN"):
-            total +=1
     #checking mid Term potential
     if midT != None:
         number+=1
         if(midT == "UP"):
-            total+=1
-        elif (midT == "DOWN"):
-            total +=1
+            total+=1   
     #checking long Term potential
     if longT != None:
         number+=1
         if(longT == "UP"):
-            total+=1
-        elif (longT == "DOWN"):
-            total +=1
+            total+=1    
     if number!= 0:
         return total/number
     else:
@@ -129,6 +128,17 @@ def file_reader(fileName):
         Names.append(line)
 
 def json_reader(json_object):
+    #global variables
+    global debtEquity_ratio 
+    global pb_ratio
+    global freeCachFlow 
+    global peg_ratio 
+    global marketCap
+    global recommendationKey 
+    global cachCap_ratio 
+    global shortT 
+    global midT 
+    global longT 
     #Extracting metrics from json
     if int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"]) != None: #causes error with ARKK
         peg_ratio = int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"])
@@ -153,6 +163,18 @@ def json_reader(json_object):
 
 #reseting global variables to 0 after each iteration
 def clear_metrics():
+     #global variables
+    global debtEquity_ratio 
+    global pb_ratio
+    global freeCachFlow 
+    global peg_ratio 
+    global marketCap
+    global recommendationKey 
+    global cachCap_ratio 
+    global shortT 
+    global midT 
+    global longT 
+    #clearing global variables
     price = None
     debtEquity_ratio = None # not too high but not too low
     pb_ratio = None #<1 is good
