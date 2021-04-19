@@ -61,26 +61,21 @@ def debtEquity(debtEquity_ratio):
 def trends(shortT, midT, longT):
     total = 0
     number = 0 #number of non null arguments
-
-    #for debugging 
-    print(shortT)
-    print(midT)
-    print(longT)
     #checking short Term potential
     if shortT != None:
         number+=1
         if(shortT == "UP"):
-            total+=1
+            total+=0.5
     #checking mid Term potential
     if midT != None:
         number+=1
         if(midT == "UP"):
-            total+=1   
+            total+=0.5   
     #checking long Term potential
     if longT != None:
         number+=1
         if(longT == "UP"):
-            total+=1    
+            total+=0.5    
     if number!= 0:
         return total/number
     else:
@@ -102,7 +97,7 @@ def algo_picker(peg_ratio, pb_ratio, debtEquity_ratio, cachCap_ratio, recommenda
         total += cachCap_ratio
     #check recommendation key
     if recommendationKey == True:
-        total +=1
+        total +=0.5
     #adding trend to the total    
     if trend !=None:
         total+= trend
@@ -274,7 +269,7 @@ book.close()"""
 fileName = input("Enter the name of the .txt file: ").strip().upper()
 file_reader(fileName)
 # Create an new Excel file and add a worksheet.
-book = xlsxwriter.Workbook("test1.xlsx")
+book = xlsxwriter.Workbook("test2.xlsx")
 sheet = book.add_worksheet()
 i = 0
 for name in Names:
