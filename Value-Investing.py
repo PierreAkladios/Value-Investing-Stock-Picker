@@ -135,7 +135,7 @@ def json_reader(json_object):
     global midT 
     global longT 
     #Extracting metrics from json
-    if int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"]) != None: #causes error with ARKK
+    if int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"]) != None: 
         peg_ratio = int(json_object["defaultKeyStatistics"]["pegRatio"]["raw"])
     if int(json_object["defaultKeyStatistics"]["priceToBook"]["raw"]) != None:
         pb_ratio = int(json_object["defaultKeyStatistics"]["priceToBook"]["raw"])
@@ -269,15 +269,26 @@ book.close()"""
 fileName = input("Enter the name of the .txt file: ").strip().upper()
 file_reader(fileName)
 # Create an new Excel file and add a worksheet.
-book = xlsxwriter.Workbook("test2.xlsx")
+book = xlsxwriter.Workbook("test3.xlsx")
 sheet = book.add_worksheet()
 i = 0
 for name in Names:
     ticker = name.strip()
     listOfMetrics.append(ticker)
     response = getMetrics(ticker, "CA")
-    json_object = json.loads(response.text)
-    json_reader(json_object)
+    try:
+        json_object = json.loads(response.text)
+    except json.JSONDecodeError: #Find a way to import this error
+        clear_metrics()
+        i+=1
+        continue
+    #catching key errors in json
+    try:
+        json_reader(json_object)
+    except KeyError:
+        clear_metrics()
+        i+=1
+        continue
     trend = trends(shortT,midT,longT)
     cachCap_ratio = cachCap(freeCachFlow,marketCap)
     result = algo_picker(peg_ratio, pb_ratio,debtEquity_ratio,cachCap_ratio, recommendationKey, trend)
