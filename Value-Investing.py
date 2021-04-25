@@ -230,12 +230,6 @@ while (isInvalid):
         print("ERROR")
         isInvalid = True
 '''
-#commented out because it is only for 1 ticker at a time
-"""trend = trends(shortT,midT,longT)
-cachCap_ratio = cachCap(freeCachFlow,marketCap)
-result = algo_picker(peg(peg_ratio), pb(pb_ratio),debtEquity(debtEquity_ratio),cachCap_ratio, recommendationKey, trend)
-#adding result for excel
-listOfMetrics.append(result)"""
 
 #Test
 """ print(peg_ratio)
@@ -249,27 +243,24 @@ print(longT) """
 
 #print(result)
 
-
-"""#Putting esults in an excel sheet
-# Create an new Excel file and add a worksheet.
-book = xlsxwriter.Workbook('test.xlsx')
-sheet = book.add_worksheet()
-#Printing all the metrics on a row in excel
-for col_num, data in enumerate(listOfMetrics):
-    sheet.write(0, col_num, data)
-
-book.close()"""
-
 #make the input a .txt file containing a long list of stocks
 #making the excel part and the rest of the program able to iterate
 
 #making it work for many stocks at the same time
 
 #getting the list of all ticker symbols
+isInvalid = True
 fileName = input("Enter the name of the .txt file: ").strip().upper()
-file_reader(fileName)
+while isInvalid: 
+    try:
+        file_reader(fileName)
+        isInvalid = False
+        sheetName = fileName.replace(".txt","")
+    except FileNotFoundError:
+        fileName = input("File name is invalid. Please Enter the Name of a valid .txt file: ").strip().upper()
+
 # Create an new Excel file and add a worksheet.
-book = xlsxwriter.Workbook("test3.xlsx")
+book = xlsxwriter.Workbook(sheetName+".xlsx")
 sheet = book.add_worksheet()
 i = 0
 for name in Names:
