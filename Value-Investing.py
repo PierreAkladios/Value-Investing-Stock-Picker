@@ -13,7 +13,7 @@ url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-statistics"
 def getMetrics(ticker, country):
     #Api Code
     querystring = {"symbol":ticker,"region":country}
-
+    #insert API key here
     headers = {
     'x-rapidapi-key': "4e08668ab1mshd05172b533fcfb5p1809a2jsnd750a952af5e",
     'x-rapidapi-host': "apidojo-yahoo-finance-v1.p.rapidapi.com"
